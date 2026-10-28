@@ -1,0 +1,905 @@
+
+<title>Paragraph Structure</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Outfit:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&family=Cairo:wght@400;600&display=swap" rel="stylesheet">
+<style>
+/* Layout concept: a paragraph drawn as a golden sandwich. Home shows the three layers as cards,
+   each card opens its own page, and the last page splits into video and a thank-you panel. */
+:root{
+  --ink:#0a0e1a;
+  --panel:#111830;
+  --panel-2:#18214a;
+  --line:rgba(243,234,215,.13);
+  --text:#f3ead7;
+  --muted:#a6aec6;
+  --gold:#ecbb4a;
+  --sea:#52d6c4;
+  --coral:#ff8a6b;
+  --display:'Instrument Serif','Times New Roman',serif;
+  --body:'Outfit',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --mono:'IBM Plex Mono',ui-monospace,Menlo,monospace;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;background:var(--ink);color:var(--text);
+  font-family:var(--body);font-size:17px;line-height:1.6;font-weight:300;
+  padding-left:max(16px,env(safe-area-inset-left,0px));
+  padding-right:max(16px,env(safe-area-inset-right,0px));
+  padding-block:0;
+  background-image:radial-gradient(70% 50% at 85% -10%,rgba(236,187,74,.14),transparent 60%),radial-gradient(60% 50% at -10% 30%,rgba(82,214,196,.08),transparent 60%);
+  background-attachment:fixed;
+  min-height:100vh;
+}
+#dust{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:0}
+.shell{position:relative;z-index:1;max-width:1180px;margin:0 auto;padding-block:20px 48px}
+h1,h2,h3{font-family:var(--display);font-weight:400;margin:0;text-wrap:balance;line-height:1}
+em{font-style:italic}
+p{margin:0}
+button{font:inherit;color:inherit;cursor:pointer}
+:focus-visible{outline:2px solid var(--gold);outline-offset:3px}
+ 
+/* top bar */
+.top{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;padding-bottom:18px;border-bottom:1px solid var(--line)}
+.brand{font-family:var(--mono);font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.steps{display:flex;gap:6px;flex-wrap:wrap}
+.steps button{background:none;border:1px solid transparent;border-radius:999px;padding:6px 14px;font-size:.85rem;color:var(--muted);transition:.25s}
+.steps button:hover{color:var(--text);border-color:var(--line)}
+.steps button[aria-current="page"]{color:var(--ink);background:var(--gold);font-weight:500}
+ 
+/* views */
+.view:not([hidden]){animation:rise .6s cubic-bezier(.2,.7,.2,1) both}
+@keyframes rise{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.view[data-accent="topic"]{--c:var(--gold)}
+.view[data-accent="supporting"]{--c:var(--sea)}
+.view[data-accent="concluding"]{--c:var(--coral)}
+ 
+.eyebrow{font-family:var(--mono);font-size:.74rem;letter-spacing:.16em;text-transform:uppercase;color:var(--c,var(--gold))}
+.lead{font-size:clamp(1.1rem,2.2vw,1.35rem);line-height:1.55;max-width:62ch;color:var(--text)}
+.muted{color:var(--muted)}
+ 
+/* hero */
+.hero{display:grid;grid-template-columns:1.15fr .85fr;gap:32px;align-items:center;padding-block:44px 28px}
+.hero > *{min-width:0}
+.hero h1{font-size:clamp(3.2rem,9.5vw,7rem);line-height:.92;letter-spacing:-.01em;margin:14px 0 22px}
+.shine{
+  font-style:italic;
+  background:linear-gradient(100deg,#c98f1f 0%,#ffe19a 35%,#ecbb4a 55%,#b97d14 100%);
+  background-size:220% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;
+  animation:shine 6s ease-in-out infinite alternate;
+}
+@keyframes shine{from{background-position:0 0}to{background-position:100% 0}}
+.defbox{margin-top:26px;padding:18px 20px;border:1px solid var(--line);border-radius:16px;background:rgba(17,24,48,.6);max-width:56ch}
+.defbox b{font-weight:500;color:var(--gold)}
+.stack{width:100%;max-width:400px;justify-self:center;overflow:visible}
+.stack .layer{animation:float 5.5s ease-in-out infinite}
+.stack .l2{animation-delay:-1.8s}
+.stack .l3{animation-delay:-3.6s}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
+.stack .ln{transform-box:fill-box;transform-origin:left center;animation:grow 3.4s ease-in-out infinite alternate}
+.stack .ln:nth-of-type(2){animation-delay:.3s}
+.stack .ln:nth-of-type(3){animation-delay:.6s}
+.stack .ln:nth-of-type(4){animation-delay:.9s}
+@keyframes grow{from{transform:scaleX(.55)}to{transform:scaleX(1)}}
+.stack text{font-family:var(--mono);font-size:13px;letter-spacing:.06em}
+ 
+/* cards */
+.cards-head{display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap;margin:26px 0 16px}
+.cards-head h2{font-size:clamp(1.7rem,3.4vw,2.4rem)}
+.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.card{
+  --c:var(--gold);
+  position:relative;text-align:left;display:flex;flex-direction:column;gap:14px;min-width:0;
+  padding:24px;border-radius:26px;border:1px solid var(--line);
+  background:radial-gradient(120% 80% at 100% 0%,color-mix(in srgb,var(--c) 24%,transparent),transparent 62%),var(--panel);
+  transition:transform .35s cubic-bezier(.2,.7,.2,1),border-color .3s,box-shadow .35s;
+}
+.card[data-go="supporting"]{--c:var(--sea)}
+.card[data-go="concluding"]{--c:var(--coral)}
+.card:hover,.card:focus-visible{transform:translateY(-8px);border-color:var(--c);box-shadow:0 22px 50px -18px color-mix(in srgb,var(--c) 55%,transparent)}
+.card svg{width:76px;height:64px}
+.card .gl{fill:rgba(243,234,215,.14)}
+.card .gl.on{fill:var(--c)}
+.card h3{font-size:2rem}
+.card .k{font-family:var(--mono);font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--c)}
+.card p{color:var(--muted);font-size:.98rem}
+.card .open{margin-top:auto;display:inline-flex;align-items:center;gap:8px;color:var(--c);font-weight:500;padding-top:6px}
+.card .open i{font-style:normal;transition:transform .3s}
+.card:hover .open i{transform:translateX(6px)}
+ 
+/* detail pages */
+.dhead{padding-block:40px 10px;display:grid;gap:18px}
+.dhead h1{font-size:clamp(2.6rem,7vw,5.2rem);line-height:.95}
+.dhead h1 em{color:var(--c)}
+.def{margin-top:8px;padding:22px 24px;border-radius:22px;border:1px solid var(--line);
+  background:radial-gradient(110% 120% at 0% 0%,color-mix(in srgb,var(--c) 18%,transparent),transparent 60%),var(--panel);max-width:860px}
+.def .eyebrow{display:block;margin-bottom:8px}
+.def p{font-size:clamp(1.15rem,2.4vw,1.5rem);line-height:1.45;font-family:var(--display)}
+.sec{margin-top:44px}
+.sec > h2{font-size:clamp(1.7rem,3.6vw,2.5rem);margin-bottom:6px}
+.sec > .sub{color:var(--muted);margin-bottom:18px;max-width:64ch}
+.panel{border:1px solid var(--line);border-radius:20px;background:var(--panel);padding:22px}
+ 
+.formula{display:flex;flex-wrap:wrap;align-items:center;gap:10px 14px;margin-bottom:18px}
+.formula .op{color:var(--muted);font-size:1.6rem}
+.tag{display:inline-flex;align-items:center;gap:8px;padding:8px 16px;border-radius:999px;font-size:.92rem;font-weight:500}
+.tag.t{background:color-mix(in srgb,var(--gold) 20%,transparent);color:var(--gold);border:1px solid color-mix(in srgb,var(--gold) 55%,transparent)}
+.tag.c{background:color-mix(in srgb,var(--sea) 14%,transparent);color:var(--sea);border:1px solid color-mix(in srgb,var(--sea) 50%,transparent)}
+.tag.s{background:var(--text);color:var(--ink)}
+.sample{font-family:var(--display);font-size:clamp(1.5rem,3.6vw,2.4rem);line-height:1.3}
+.hl-t{background:color-mix(in srgb,var(--gold) 24%,transparent);box-shadow:inset 0 -2px 0 var(--gold);padding:0 .18em;border-radius:6px}
+.hl-c{color:var(--sea);text-decoration:underline;text-decoration-thickness:2px;text-underline-offset:6px}
+ 
+.three{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.three > *{min-width:0}
+.rule{padding:20px;border-radius:18px;border:1px solid var(--line);background:var(--panel);display:grid;gap:10px;align-content:start}
+.rule .n{font-family:var(--mono);font-size:.74rem;letter-spacing:.14em;color:var(--c);text-transform:uppercase}
+.rule h3{font-size:1.5rem;line-height:1.1}
+.rule .ex{font-size:.95rem;color:var(--muted)}
+.rule .ex b{color:var(--text);font-weight:400}
+.bad{color:var(--coral)}
+.good{color:var(--sea)}
+ 
+/* balance tester */
+.tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
+.tabs button{padding:9px 18px;border-radius:999px;border:1px solid var(--line);background:none;font-size:.92rem;transition:.25s}
+.tabs button:hover{border-color:var(--c)}
+.tabs button[aria-selected="true"]{background:var(--c);border-color:var(--c);color:var(--ink);font-weight:500}
+.rows{display:grid;gap:10px}
+.row{display:grid;grid-template-columns:150px 1fr;gap:6px 18px;align-items:baseline;padding:12px 0;border-bottom:1px solid var(--line)}
+.row:last-of-type{border-bottom:0}
+.row span{font-family:var(--mono);font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.row b{font-weight:400;font-size:1.1rem;min-width:0;overflow-wrap:anywhere}
+.verdict{margin-top:6px;padding:14px 16px;border-radius:14px;background:color-mix(in srgb,var(--c) 14%,transparent);color:var(--text)}
+ 
+/* mistakes */
+.mist{display:grid;gap:12px}
+.mrow{display:grid;grid-template-columns:150px 1fr 1fr;gap:10px 18px;padding:16px 18px;border-radius:16px;border:1px solid var(--line);background:var(--panel);align-items:start}
+.mrow > *{min-width:0}
+.mrow .l{font-family:var(--mono);font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.mrow .x{color:var(--coral);text-decoration:line-through;text-decoration-color:color-mix(in srgb,var(--coral) 60%,transparent)}
+.mrow .y{color:var(--sea)}
+.mrow small{display:block;font-family:var(--mono);font-size:.66rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:2px;text-decoration:none}
+ 
+.two{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.two > *{min-width:0}
+.note{padding:18px 20px;border-radius:18px;border:1px dashed color-mix(in srgb,var(--c) 55%,transparent);background:color-mix(in srgb,var(--c) 8%,transparent)}
+.note b{color:var(--c);font-weight:500}
+ 
+/* timeline (a real sequence: order matters) */
+.tl{list-style:none;margin:0;padding:0;display:grid;gap:0;position:relative}
+.tl li{display:grid;grid-template-columns:150px 1fr;gap:6px 22px;padding:16px 0;border-bottom:1px solid var(--line)}
+.tl li:last-child{border-bottom:0}
+.tl .who{font-family:var(--mono);font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:var(--c)}
+.tl li.ex .who{color:var(--muted)}
+.tl li.ex .txt{color:var(--muted)}
+.tl .txt{font-family:var(--display);font-size:1.35rem;line-height:1.35;min-width:0}
+.chips{display:flex;gap:10px;flex-wrap:wrap}
+.chip{padding:9px 18px;border-radius:999px;border:1px solid color-mix(in srgb,var(--c) 55%,transparent);color:var(--c);font-family:var(--display);font-size:1.25rem;font-style:italic}
+ 
+/* Q&A */
+details{border:1px solid var(--line);border-radius:16px;background:var(--panel);padding:0 20px;transition:border-color .3s}
+details + details{margin-top:10px}
+details[open]{border-color:var(--c)}
+summary{list-style:none;cursor:pointer;padding:16px 0;display:flex;justify-content:space-between;gap:16px;align-items:center;font-size:1.05rem}
+summary::-webkit-details-marker{display:none}
+summary::after{content:"+";font-size:1.5rem;color:var(--c);transition:transform .3s;flex:none}
+details[open] summary::after{transform:rotate(45deg)}
+details .ans{padding:0 0 18px;color:var(--muted)}
+details .ans b{color:var(--text);font-weight:400}
+ 
+/* concluding quote */
+.quote{font-family:var(--display);font-size:clamp(1.6rem,4vw,2.7rem);line-height:1.25}
+.quote .cue{color:var(--c);font-style:italic}
+ 
+/* sandwich recap */
+.sand{display:grid;gap:8px}
+.sand div{padding:14px 18px;border-radius:14px;display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap;align-items:baseline}
+.sand .a{background:color-mix(in srgb,var(--gold) 20%,transparent);border:1px solid color-mix(in srgb,var(--gold) 50%,transparent);border-radius:28px 28px 12px 12px}
+.sand .b{background:color-mix(in srgb,var(--sea) 12%,transparent);border:1px dashed color-mix(in srgb,var(--sea) 50%,transparent);padding-block:22px}
+.sand .c{background:color-mix(in srgb,var(--coral) 20%,transparent);border:1px solid color-mix(in srgb,var(--coral) 50%,transparent);border-radius:12px 12px 28px 28px}
+.sand span{font-family:var(--mono);font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.sand b{font-weight:400}
+ 
+/* ordering activity */
+.act{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.act > *{min-width:0}
+.pool,.built{display:grid;gap:10px;align-content:start}
+.pool button{text-align:left;padding:14px 16px;border-radius:14px;border:1px solid var(--line);background:var(--panel);transition:.25s}
+.pool button:hover:not(:disabled){border-color:var(--c);transform:translateX(4px)}
+.pool button:disabled{opacity:.28;cursor:default}
+.pool button.shake{animation:shake .4s;border-color:var(--coral)}
+@keyframes shake{20%,60%{transform:translateX(-7px)}40%,80%{transform:translateX(7px)}}
+.slot{display:grid;grid-template-columns:34px 1fr;gap:12px;align-items:start;padding:12px 14px;border-radius:14px;border:1px dashed var(--line);min-height:56px;color:var(--muted)}
+.slot.done{border:1px solid var(--c);color:var(--text);background:color-mix(in srgb,var(--c) 10%,transparent);animation:rise .4s both}
+.slot i{font-style:normal;font-family:var(--mono);color:var(--c)}
+.status{margin-top:14px;min-height:1.6em;color:var(--muted)}
+.status.win{color:var(--sea)}
+.btn{display:inline-flex;align-items:center;gap:10px;padding:12px 22px;border-radius:999px;border:1px solid var(--line);background:none;font-weight:400;transition:.28s}
+.btn:hover{border-color:var(--text);transform:translateY(-2px)}
+.btn.primary{background:var(--gold);border-color:var(--gold);color:var(--ink);font-weight:500}
+.btn.primary:hover{box-shadow:0 14px 34px -12px rgba(236,187,74,.7)}
+ 
+/* pager */
+.pager{display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap;margin-top:56px;padding-top:24px;border-top:1px solid var(--line)}
+ 
+/* thanks */
+.split{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:28px;min-height:min(68vh,620px)}
+.split > *{min-width:0}
+.vpanel{position:relative;border-radius:26px;overflow:hidden;background:#05070f;border:1px solid var(--line);animation:fadeIn 1.9s ease .25s both}
+.vpanel video{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:#000}
+.drop{position:absolute;inset:0;display:grid;place-items:center;text-align:center;padding:24px;gap:10px;align-content:center;
+  background:radial-gradient(80% 70% at 50% 40%,rgba(236,187,74,.12),transparent 70%)}
+.drop p{max-width:30ch;color:var(--muted);font-size:.95rem}
+.drop .ring{width:74px;height:74px;border-radius:50%;border:1px solid var(--gold);display:grid;place-items:center;margin:0 auto 6px;animation:pulse 2.6s ease-in-out infinite}
+.drop .ring svg{width:26px;height:26px;fill:var(--gold)}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(236,187,74,.45)}50%{box-shadow:0 0 0 18px rgba(236,187,74,0)}}
+.drop.over{background:radial-gradient(80% 70% at 50% 40%,rgba(236,187,74,.28),transparent 70%)}
+.tpanel{border-radius:26px;border:1px solid var(--line);padding:clamp(24px,5vw,56px);display:flex;flex-direction:column;justify-content:center;gap:22px;
+  background:radial-gradient(100% 80% at 100% 0%,rgba(236,187,74,.2),transparent 62%),radial-gradient(90% 70% at 0% 100%,rgba(82,214,196,.12),transparent 60%),var(--panel)}
+.tpanel h1{font-size:clamp(3rem,7.5vw,6rem);line-height:.95}
+.tpanel .rs{animation:rise .9s cubic-bezier(.2,.7,.2,1) both}
+.tpanel .rs:nth-child(1){animation-delay:.9s}
+.tpanel .rs:nth-child(2){animation-delay:1.25s}
+.tpanel .rs:nth-child(3){animation-delay:1.6s}
+.tpanel .rs:nth-child(4){animation-delay:1.9s}
+.btnrow{display:flex;gap:12px;flex-wrap:wrap}
+ 
+@media (max-width:900px){
+  .hero{grid-template-columns:1fr;padding-block:30px 10px}
+  .stack{max-width:300px}
+  .cards,.three,.two,.act{grid-template-columns:1fr}
+  .mrow{grid-template-columns:1fr}
+  .row,.tl li{grid-template-columns:1fr}
+  .split{grid-template-columns:1fr;min-height:0}
+  .vpanel{aspect-ratio:16/9}
+  .brand{display:none}
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none!important;transition:none!important}
+  html{scroll-behavior:auto}
+}
+ 
+[hidden]{display:none!important}
+.view{--c:var(--gold)}
+.top{border-bottom:0;padding-bottom:6px}
+.tog{padding:8px 16px;font-size:.85rem}
+.tog[aria-pressed="true"]{border-color:var(--gold);color:var(--gold)}
+.navrow{display:flex;gap:8px;overflow-x:auto;padding:8px 0 14px;border-bottom:1px solid var(--line);scrollbar-width:thin}
+.navrow button{flex:none;display:flex;flex-direction:column;gap:2px;align-items:flex-start;text-align:left;padding:9px 16px;border-radius:14px;border:1px solid var(--line);background:none;transition:.25s;min-width:158px}
+.navrow button.sm{min-width:0}
+.navrow small{font-family:var(--mono);font-size:.62rem;letter-spacing:.12em;text-transform:uppercase;color:var(--gold)}
+.navrow span{font-size:.9rem;color:var(--text);white-space:nowrap}
+.navrow button:hover{border-color:var(--gold)}
+.navrow button[aria-current="page"]{background:var(--gold);border-color:var(--gold)}
+.navrow button[aria-current="page"] small,.navrow button[aria-current="page"] span{color:var(--ink)}
+ 
+.arsub{font-family:'Cairo',var(--body);direction:rtl;text-align:left;color:var(--muted);font-size:1.15rem;margin-top:-4px}
+.sgrid{display:grid;grid-template-columns:1.05fr .95fr;gap:22px;margin-top:26px;align-items:start}
+.sgrid > *{min-width:0}
+.spanel{border:1px solid var(--line);border-radius:22px;background:var(--panel);padding:14px 10px 12px}
+.spanel > .eyebrow{display:block;padding:6px 14px 10px}
+.script{display:grid;gap:2px}
+.sl{padding:9px 14px;border-radius:12px;cursor:pointer;transition:background .2s,box-shadow .2s}
+.sl:hover{background:rgba(243,234,215,.05)}
+.sl.on{background:color-mix(in srgb,var(--gold) 15%,transparent);box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--gold) 55%,transparent)}
+.sl .en{display:none;font-size:1.05rem;font-weight:400;color:var(--muted);line-height:1.4;margin-bottom:2px}
+body.show-en .sl .en{display:block}
+.sl .ar{font-family:'Cairo',var(--body);direction:rtl;text-align:right;color:var(--text);font-size:1.3rem;line-height:1.6}
+.sl.hand .ar{color:var(--muted)}
+.vis{display:grid;gap:16px;align-content:start}
+.vis > *{min-width:0}
+.big{font-family:var(--display);font-size:clamp(1.3rem,2.6vw,1.8rem);line-height:1.35}
+.pg{border:1px solid var(--line);border-radius:12px;padding:18px;background:rgba(243,234,215,.03);display:grid;gap:9px;margin:12px 0}
+.pg i{display:block;height:8px;border-radius:4px;background:rgba(243,234,215,.26)}
+.pg .ind{display:grid;grid-template-columns:52px 1fr;gap:6px;align-items:center}
+.pg .ind span{font-family:var(--mono);font-size:.6rem;letter-spacing:.08em;text-transform:uppercase;color:var(--gold);border:1px dashed var(--gold);border-radius:6px;padding:2px 4px;text-align:center}
+.pg .ind i{background:var(--gold)}
+.meter{display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:center;margin:12px 0}
+.meter span{font-family:var(--mono);font-size:.7rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.bar{height:10px;border-radius:5px;background:rgba(243,234,215,.12);overflow:hidden}
+.bar i{display:block;height:100%;background:linear-gradient(90deg,var(--gold),var(--sea));transform-origin:left;animation:stretch 4s ease-in-out infinite alternate}
+@keyframes stretch{from{transform:scaleX(.1)}to{transform:scaleX(1)}}
+.schem{display:grid;gap:8px;margin:14px 0}
+.schem i{height:9px;border-radius:5px;background:rgba(243,234,215,.22)}
+.schem b{padding:10px 14px;border-radius:12px;font-weight:500;font-size:.82rem;font-family:var(--mono);letter-spacing:.06em;text-transform:uppercase;background:color-mix(in srgb,var(--gold) 22%,transparent);border:1px solid var(--gold);color:var(--gold)}
+.schem b.flash{animation:flash 2.4s ease-in-out infinite}
+@keyframes flash{50%{background:color-mix(in srgb,var(--gold) 45%,transparent)}}
+.quote2{font-family:var(--display);font-size:1.25rem;line-height:1.4}
+.quote2 .hl-t{padding:0 .15em}
+.qz{padding:16px 18px;border:1px solid var(--line);border-radius:16px;background:var(--panel);display:grid;gap:12px}
+.qz p{font-family:var(--display);font-size:1.35rem;line-height:1.35}
+.qz .opts{display:flex;gap:8px;flex-wrap:wrap}
+.qz .opts button{padding:8px 14px;border-radius:999px;border:1px solid var(--line);background:none;font-size:.88rem;transition:.2s}
+.qz .opts button:hover{border-color:var(--gold)}
+.qz .opts button.ok{background:var(--sea);border-color:var(--sea);color:var(--ink);font-weight:500}
+.qz .opts button.no{border-color:var(--coral);color:var(--coral)}
+.qz .fb{min-height:1.4em;font-size:.92rem;color:var(--muted)}
+.check{list-style:none;padding:0;margin:0;display:grid;gap:10px}
+.check li{display:flex;gap:12px;align-items:center;padding:12px 16px;border:1px solid var(--line);border-radius:14px;background:var(--panel)}
+.check li::before{content:"✓";color:var(--sea);font-weight:600}
+.map{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.tile{text-align:left;display:grid;gap:4px;padding:18px 20px;border-radius:18px;border:1px solid var(--line);background:var(--panel);transition:.3s;min-width:0}
+.tile:hover{border-color:var(--gold);transform:translateY(-4px)}
+.tile .k{font-family:var(--mono);font-size:.68rem;letter-spacing:.14em;text-transform:uppercase;color:var(--gold)}
+.tile b{font-family:var(--display);font-weight:400;font-size:1.55rem;line-height:1.1}
+.tile i{font-style:normal;font-family:'Cairo',var(--body);direction:rtl;text-align:left;color:var(--muted);font-size:.95rem}
+.sand small{display:block}
+.vgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,420px),1fr));gap:16px;margin-top:26px;align-items:start}
+.vgrid > *{min-width:0}
+@media (max-width:900px){
+  .sgrid,.map{grid-template-columns:1fr}
+  .navrow button{min-width:150px}
+}
+</style>
+ 
+<canvas id="dust" aria-hidden="true"></canvas>
+ 
+<div class="shell">
+  <header class="top">
+    <div class="brand">Week 2 · Academic Writing</div>
+  </header>
+  <nav class="navrow" aria-label="Lesson paragraphs">
+      <button class="sm" data-go="home"><small>Start</small><span>Home</span></button>
+      <button data-go="p1"><small>Paragraph 1</small><span>What is a paragraph?</span></button>
+      <button data-go="p2"><small>Paragraph 2</small><span>The three parts</span></button>
+      <button data-go="p3"><small>Paragraph 3</small><span>The topic sentence</span></button>
+      <button data-go="p4"><small>Paragraph 4</small><span>Not too general or specific</span></button>
+      <button data-go="p5"><small>Paragraph 5</small><span>Position</span></button>
+      <button data-go="p6"><small>Paragraph 6</small><span>Practice and conclusion</span></button>
+      <button class="sm" data-go="thanks"><small>Finish</small><span>Thank you</span></button>
+  </nav>
+ 
+  <main>
+ 
+    <!-- HOME -->
+    <section class="view" data-view="home" hidden>
+      <div class="hero">
+        <div>
+          <span class="eyebrow">Week 2 · Academic Writing</span>
+          <h1>Paragraph <span class="shine">Structure</span></h1>
+          <p class="lead">One paragraph, one main idea. Every good paragraph is built from the same three layers.</p>
+          <div class="defbox"><b>Definition.</b> A paragraph is a group of related sentences that discuss one (and usually only one) main idea.</div>
+          <div class="btnrow" style="margin-top:22px"><button class="btn primary" data-go="p1">Start the lesson →</button></div>
+        </div>
+        <svg class="stack" viewBox="0 0 360 340" role="img" aria-label="A paragraph drawn as three layers: topic sentence, supporting sentences, concluding sentence">
+          <defs>
+            <linearGradient id="gg" x1="0" x2="1"><stop offset="0" stop-color="#c98f1f"/><stop offset=".5" stop-color="#ffe19a"/><stop offset="1" stop-color="#d9a02e"/></linearGradient>
+            <linearGradient id="cg" x1="0" x2="1"><stop offset="0" stop-color="#e2664a"/><stop offset="1" stop-color="#ffa88c"/></linearGradient>
+          </defs>
+          <ellipse cx="180" cy="322" rx="120" ry="9" fill="#000" opacity=".35"/>
+          <g class="layer l1">
+            <rect x="34" y="22" width="292" height="78" rx="38" fill="url(#gg)"/>
+            <text x="180" y="66" text-anchor="middle" fill="#0a0e1a">TOPIC SENTENCE</text>
+          </g>
+          <g class="layer l2">
+            <rect x="26" y="116" width="308" height="122" rx="20" fill="#52d6c4" fill-opacity=".12" stroke="#52d6c4" stroke-opacity=".6" stroke-dasharray="5 5"/>
+            <text x="46" y="142" fill="#52d6c4">SUPPORTING SENTENCES</text>
+            <rect class="ln" x="46" y="156" width="250" height="8" rx="4" fill="#52d6c4"/>
+            <rect class="ln" x="46" y="176" width="268" height="8" rx="4" fill="#52d6c4" opacity=".8"/>
+            <rect class="ln" x="46" y="196" width="210" height="8" rx="4" fill="#52d6c4" opacity=".65"/>
+            <rect class="ln" x="46" y="216" width="240" height="8" rx="4" fill="#52d6c4" opacity=".5"/>
+          </g>
+          <g class="layer l3">
+            <rect x="34" y="254" width="292" height="58" rx="28" fill="url(#cg)"/>
+            <text x="180" y="288" text-anchor="middle" fill="#0a0e1a">CONCLUDING SENTENCE</text>
+          </g>
+        </svg>
+      </div>
+ 
+      
+      <div class="cards-head"><h2>The lesson map. <em class="muted">Six paragraphs.</em></h2><span class="eyebrow">Tap one to open it</span></div>
+      <div class="map">
+        <button class="tile" data-go="p1"><span class="k">Paragraph 1</span><b>What is a paragraph?</b><i dir="rtl">يعني إيه فقرة؟</i></button>
+        <button class="tile" data-go="p2"><span class="k">Paragraph 2</span><b>The three parts</b><i dir="rtl">أجزاء الفقرة التلاتة</i></button>
+        <button class="tile" data-go="p3"><span class="k">Paragraph 3</span><b>The topic sentence</b><i dir="rtl">الجملة الرئيسية</i></button>
+        <button class="tile" data-go="p4"><span class="k">Paragraph 4</span><b>Not too general or specific</b><i dir="rtl">مش عامة قوي ولا محددة قوي</i></button>
+        <button class="tile" data-go="p5"><span class="k">Paragraph 5</span><b>Position</b><i dir="rtl">مكان الجملة الرئيسية</i></button>
+        <button class="tile" data-go="p6"><span class="k">Paragraph 6</span><b>Practice and conclusion</b><i dir="rtl">التطبيق والخلاصة</i></button>
+        </div>
+      <div class="pager"><span class="muted">Use the buttons at the top, or the arrow keys.</span><button class="btn primary" data-go="p1">Start with Paragraph 1 →</button></div>
+    </section>
+ 
+    <!-- P1 -->
+    <section class="view" data-view="p1" hidden>
+      <div class="dhead">
+        <span class="eyebrow">Paragraph 1 of 6</span>
+        <h1>What is a <em>paragraph</em>?</h1>
+        <p class="arsub" dir="rtl">الفقرة 1 · يعني إيه فقرة؟</p>
+      </div>
+      <div class="vgrid">
+          <div class="panel"><span class="eyebrow">Definition</span><p class="big">A paragraph is a group of related sentences that discuss one main idea.</p></div>
+          <div class="panel"><span class="eyebrow">How long?</span>
+            <div class="meter"><span>1 sentence</span><div class="bar"><i></i></div><span>10 sentences</span></div>
+            <p class="muted">The number of sentences is unimportant. The paragraph just has to be long enough to develop the idea.</p></div>
+          <div class="two">
+            <div class="note"><b>On its own.</b> For example, an answer in an exam: "Define management by objective, and give one example of it."</div>
+            <div class="note"><b>Part of a longer piece.</b> Such as an essay or a book.</div>
+          </div>
+          <div class="panel"><span class="eyebrow">Indent the first word</span>
+            <div class="pg"><div class="ind"><span>indent</span><i></i></div><i></i><i></i><i style="width:70%"></i></div>
+            <p class="muted">Leave about half an inch (five spaces) from the left margin. In English we start on the left.</p></div>
+      </div>
+      <div class="pager"><button class="btn" data-back>← Back to home</button><button class="btn primary" data-next>Paragraph 2: the three parts →</button></div>
+    </section>
+ 
+    <!-- P2 -->
+    <section class="view" data-view="p2" hidden>
+      <div class="dhead">
+        <span class="eyebrow">Paragraph 2 of 6</span>
+        <h1>The <em>three</em> parts</h1>
+        <p class="arsub" dir="rtl">الفقرة 2 · أجزاء الفقرة التلاتة</p>
+      </div>
+      <div class="vgrid">
+          <div class="sand">
+            <div class="a"><span>Top bread</span><b>Topic sentence</b></div>
+            <div class="b"><span>The meat</span><b>Supporting sentences</b></div>
+            <div class="c"><span>Bottom bread</span><b>Concluding sentence</b></div>
+          </div>
+          <div class="note"><b>Remember.</b> The concluding sentence is not always needed.</div>
+      </div>
+            <div class="sec">
+        <div class="cards-head">
+        <h2>Open each part. <em class="muted">Definitions and examples.</em></h2>
+        <span class="eyebrow">Tap a card</span>
+      </div>
+      <div class="cards">
+        <button class="card" data-go="topic">
+          <svg viewBox="0 0 76 64" aria-hidden="true"><rect class="gl on" x="2" y="2" width="72" height="16" rx="8"/><rect class="gl" x="2" y="24" width="72" height="22" rx="5"/><rect class="gl" x="2" y="52" width="72" height="10" rx="5"/></svg>
+          <span class="k">Part 1 · The top layer</span>
+          <h3>Topic sentence</h3>
+          <p>States the main idea. It names the topic and limits it with a controlling idea.</p>
+          <span class="open">Open <i>→</i></span>
+        </button>
+        <button class="card" data-go="supporting">
+          <svg viewBox="0 0 76 64" aria-hidden="true"><rect class="gl" x="2" y="2" width="72" height="12" rx="6"/><rect class="gl on" x="2" y="20" width="72" height="26" rx="5"/><rect class="gl" x="2" y="52" width="72" height="10" rx="5"/></svg>
+          <span class="k">Part 2 · The filling</span>
+          <h3>Supporting sentences</h3>
+          <p>Develop the topic sentence. They explain or prove it with points, examples and details.</p>
+          <span class="open">Open <i>→</i></span>
+        </button>
+        <button class="card" data-go="concluding">
+          <svg viewBox="0 0 76 64" aria-hidden="true"><rect class="gl" x="2" y="2" width="72" height="10" rx="5"/><rect class="gl" x="2" y="18" width="72" height="22" rx="5"/><rect class="gl on" x="2" y="46" width="72" height="16" rx="8"/></svg>
+          <span class="k">Part 3 · The bottom layer</span>
+          <h3>Concluding sentence</h3>
+          <p>Signals the end and leaves the reader with the important points to remember.</p>
+          <span class="open">Open <i>→</i></span>
+        </button>
+      </div>
+      
+      </div>
+      <div class="pager"><button class="btn" data-back>← Paragraph 1</button><button class="btn primary" data-next>Paragraph 3: the topic sentence →</button></div>
+    </section>
+ 
+    <!-- P3 -->
+    <section class="view" data-view="p3" hidden>
+      <div class="dhead">
+        <span class="eyebrow">Paragraph 3 of 6</span>
+        <h1>The <em>topic</em> sentence</h1>
+        <p class="arsub" dir="rtl">الفقرة 3 · الجملة الرئيسية</p>
+      </div>
+      <div class="vgrid">
+          <div class="panel">
+            <div class="formula"><span class="tag t">Topic</span><span class="op">+</span><span class="tag c">Controlling idea</span></div>
+            <p class="sample"><span class="hl-t">Driving on freeways</span> requires <span class="hl-c">skill and alertness</span>.</p>
+            <p class="muted" style="margin-top:12px">The controlling idea makes the topic smaller and clearer.</p>
+          </div>
+          <div class="two">
+            <div class="note"><b>It helps the writer.</b> You can see what to include and what to leave out.</div>
+            <div class="note"><b>It helps the reader.</b> You know what the paragraph is going to be about.</div>
+          </div>
+          <div class="panel"><span class="eyebrow">A complete sentence needs a subject and a verb</span>
+            <p class="ex" style="margin-top:10px"><span class="bad">✗</span> Driving on freeways.<br><span class="good">✓</span> Driving on freeways <b style="font-weight:500">requires</b> skill and alertness.</p></div>
+      </div>
+      <div class="pager"><button class="btn" data-back>← Paragraph 2</button><button class="btn primary" data-next>Paragraph 4: not too general →</button></div>
+    </section>
+ 
+    <!-- P4 -->
+    <section class="view" data-view="p4" hidden>
+      <div class="dhead">
+        <span class="eyebrow">Paragraph 4 of 6</span>
+        <h1>Not too general, <em>not too specific</em></h1>
+        <p class="arsub" dir="rtl">الفقرة 4 · مش عامة قوي ولا محددة قوي</p>
+      </div>
+      <div class="vgrid">
+          <div class="panel">
+                    <div class="tabs" role="tablist" aria-label="Level of detail">
+                      <button role="tab" aria-selected="true" data-level="general" id="tab-general">Too general</button>
+                      <button role="tab" aria-selected="false" data-level="right" id="tab-right">Just right</button>
+                      <button role="tab" aria-selected="false" data-level="specific" id="tab-specific">Too specific</button>
+                    </div>
+                    <div class="rows" role="tabpanel" aria-live="polite">
+                      <div class="row"><span>On a menu</span><b id="lv-menu"></b></div>
+                      <div class="row"><span>Egyptian menu</span><b id="lv-egypt"></b></div>
+                      <div class="row"><span>In a paragraph</span><b id="lv-para"></b></div>
+                    </div>
+                    <div class="verdict" id="lv-why"></div>
+                  </div>
+          <div class="note"><b>Think of a menu.</b> "Salad" is too general. Every ingredient is too specific. "Mixed green salad" is just right.</div>
+      </div>
+      <div class="pager"><button class="btn" data-back>← Paragraph 3</button><button class="btn primary" data-next>Paragraph 5: position →</button></div>
+    </section>
+ 
+    <!-- P5 -->
+    <section class="view" data-view="p5" hidden>
+      <div class="dhead">
+        <span class="eyebrow">Paragraph 5 of 6</span>
+        <h1>Position of the <em>topic sentence</em></h1>
+        <p class="arsub" dir="rtl">الفقرة 5 · مكان الجملة الرئيسية</p>
+      </div>
+      <div class="vgrid">
+          <div class="panel"><span class="eyebrow">Topic sentence first</span> <span class="tag t" style="margin-left:8px">best place</span>
+            <div class="schem"><b class="flash">Topic sentence</b><i></i><i style="width:82%"></i><i style="width:64%"></i></div>
+            <p class="quote2"><span class="hl-t">Synonyms do not always have the same emotional meaning.</span> For example, the words stingy and frugal both mean "careful with money."</p></div>
+          <div class="panel"><span class="eyebrow">Topic sentence last</span>
+            <div class="schem"><i></i><i style="width:82%"></i><i style="width:64%"></i><b class="flash">Topic sentence</b></div>
+            <p class="quote2">By 2030, cancer and heart disease will have been wiped out. <span class="hl-t">These are just a few examples of the medical miracles that are expected in the next few decades.</span></p></div>
+          <div class="note"><b>For beginners,</b> it is better to put the topic sentence first.</div>
+      </div>
+      <div class="pager"><button class="btn" data-back>← Paragraph 4</button><button class="btn primary" data-next>Paragraph 6: practice →</button></div>
+    </section>
+ 
+    <!-- P6 -->
+    <section class="view" data-view="p6" hidden>
+      <div class="dhead">
+        <span class="eyebrow">Paragraph 6 of 6</span>
+        <h1>Practice and <em>conclusion</em></h1>
+        <p class="arsub" dir="rtl">الفقرة 6 · التطبيق والخلاصة</p>
+      </div>
+      <div class="vgrid">
+          <div class="panel"><span class="eyebrow">Three questions to ask</span>
+            <ul class="check" style="margin-top:12px"><li>Is it a complete sentence?</li><li>Is it not too general?</li><li>Is it not too specific?</li></ul></div>
+          <div class="note"><b>In conclusion.</b> A good paragraph has a topic sentence and supporting sentences. The topic sentence is complete and clear. It is not too general, and it is not too specific.</div>
+      </div>
+            <div class="sec">
+        <h2>Try it: <em class="muted">which one is it?</em></h2>
+        <p class="sub">Rainbows. Choose the right label for each sentence.</p>
+        <div class="vis" id="quiz"></div>
+      </div>
+      <div class="pager"><button class="btn" data-back>← Paragraph 5</button><button class="btn primary" data-next>Thank you →</button></div>
+    </section>
+ 
+<!-- TOPIC -->
+    <section class="view" data-view="topic" data-accent="topic" hidden>
+      <div class="dhead">
+        <span class="eyebrow">Part 1 of 3 · Top layer</span>
+        <h1>The <em>topic</em> sentence</h1>
+        <div class="def"><span class="eyebrow">Definition</span><p>The topic sentence states the main idea of the paragraph. It names the topic and limits it to one specific area that can be discussed completely in a single paragraph.</p></div>
+      </div>
+ 
+      <div class="sec">
+        <h2>Two parts, one sentence</h2>
+        <p class="sub">The topic names the subject. The controlling idea limits it. Together they tell the writer what to include and the reader what to expect.</p>
+        <div class="panel">
+          <div class="formula">
+            <span class="tag t">Topic</span><span class="op">+</span><span class="tag c">Controlling idea</span><span class="op">=</span><span class="tag s">Topic sentence</span>
+          </div>
+          <p class="sample"><span class="hl-t">Gold</span>, a precious metal, is prized for <span class="hl-c">two important characteristics</span>.</p>
+          <p class="muted" style="margin-top:14px">From the model paragraph "Gold". The reader now knows to look for two characteristics.</p>
+        </div>
+      </div>
+ 
+      <div class="sec">
+        <h2>Three points to remember</h2>
+        <div class="three">
+          <div class="rule"><span class="n">Point 1</span><h3>A complete sentence</h3>
+            <p class="ex">It has at least one subject and one verb.</p>
+            <p class="ex"><span class="bad">✗</span> Driving on freeways.<br><span class="good">✓</span> <b>Driving on freeways requires skill and alertness.</b></p></div>
+          <div class="rule"><span class="n">Point 2</span><h3>Topic + controlling idea</h3>
+            <p class="ex">It names the topic, then limits it to a specific area.</p>
+            <p class="ex"><b>Online shopping</b> <span class="good">saves busy people time and money.</span></p></div>
+          <div class="rule"><span class="n">Point 3</span><h3>The most general statement</h3>
+            <p class="ex">It gives only the main idea, with no specific details. Not too general, not too specific.</p>
+            <p class="ex">Test it in Paragraph 4.</p></div>
+        </div>
+      </div>
+ 
+      <div class="sec">
+        <h2>Common mistakes</h2>
+        <p class="sub">Check every topic sentence for a verb, a capital letter and a period.</p>
+        <div class="mist">
+          <div class="mrow"><span class="l">No verb</span><p class="x"><small>Not this</small>Small cafés in Alexandria very popular.</p><p class="y"><small>Write this</small>Small cafés in Alexandria are very popular with students.</p></div>
+          <div class="mrow"><span class="l">Only a topic</span><p class="x"><small>Not this</small>The importance of English.</p><p class="y"><small>Write this</small>English helps business students find good jobs.</p></div>
+          <div class="mrow"><span class="l">An announcement</span><p class="x"><small>Not this</small>In this paragraph, I will talk about my city.</p><p class="y"><small>Write this</small>My city, Alexandria, is famous for its beaches.</p></div>
+          <div class="mrow"><span class="l">Too many ideas</span><p class="x"><small>Not this</small>Cairo is crowded, historic, and cheap.</p><p class="y"><small>Write this</small>Cairo has many historic places to visit.</p></div>
+        </div>
+      </div>
+ 
+      <div class="sec">
+        <h2>Where does it go?</h2>
+        <div class="two">
+          <div class="note"><b>At the beginning.</b> The best and most common choice. Readers want to know what they will read about as soon as they begin.</div>
+          <div class="note"><b>At the end.</b> Possible when the paragraph starts with examples or facts and then draws a conclusion from them.</div>
+        </div>
+      </div>
+ 
+      <div class="pager"><button class="btn" data-back>← Back to Paragraph 2</button><button class="btn primary" data-next>Next: Supporting sentences →</button></div>
+    </section>
+ 
+    <!-- SUPPORTING -->
+    <section class="view" data-view="supporting" data-accent="supporting" hidden>
+      <div class="dhead">
+        <span class="eyebrow">Part 2 of 3 · The filling</span>
+        <h1>The <em>supporting</em> sentences</h1>
+        <div class="def"><span class="eyebrow">Definition</span><p>Supporting sentences develop the topic sentence. They explain or prove it by giving more information: main points, examples and details.</p></div>
+      </div>
+ 
+      <div class="sec">
+        <h2>How "Gold" supports its topic sentence</h2>
+        <p class="sub">Two main points, and each one has its own example. The order matters, so read it from top to bottom.</p>
+        <div class="panel">
+          <ol class="tl">
+            <li><span class="who">Main point 1 · beauty</span><span class="txt">First of all, gold has a lustrous beauty that is resistant to corrosion.</span></li>
+            <li class="ex"><span class="who">Example</span><span class="txt">For example, a Macedonian coin remains as untarnished today as the day it was made 25 centuries ago.</span></li>
+            <li><span class="who">Main point 2 · usefulness</span><span class="txt">Another important characteristic of gold is its usefulness to industry and science.</span></li>
+            <li class="ex"><span class="who">Example</span><span class="txt">The most recent use of gold is in astronauts' suits.</span></li>
+          </ol>
+        </div>
+      </div>
+ 
+      <div class="sec">
+        <h2>Transition words</h2>
+        <p class="sub">They guide the reader from one supporting sentence to the next.</p>
+        <div class="chips"><span class="chip">First of all</span><span class="chip">For example</span><span class="chip">Another</span><span class="chip">Therefore</span></div>
+      </div>
+ 
+      <div class="sec">
+        <h2>What good support looks like</h2>
+        <div class="three">
+          <div class="rule"><span class="n">Tip 1</span><h3>Back every point</h3><p class="ex">Each main point gets specific examples: the Macedonian coin, the astronauts' suits.</p></div>
+          <div class="rule"><span class="n">Tip 2</span><h3>Stay on one idea</h3><p class="ex">Each controlling idea needs its own paragraph. One paragraph, one controlling idea.</p></div>
+          <div class="rule"><span class="n">Tip 3</span><h3>Add information</h3><p class="ex">Supporting sentences give more than the topic sentence did. They explain, they do not repeat.</p></div>
+        </div>
+      </div>
+ 
+      <div class="sec">
+        <h2>Analyze the model</h2>
+        <p class="sub">Tap a question to reveal the answer.</p>
+        <details><summary>1 · What is the topic of the paragraph?</summary><div class="ans"><b>Gold.</b></div></details>
+        <details><summary>2 · What two main points does the writer make about it?</summary><div class="ans"><b>Gold is beautiful</b> (sentence 2) and <b>gold is useful to industry and science</b> (sentence 6).</div></details>
+        <details><summary>3 · In which two sentences does the writer say there are two main points?</summary><div class="ans"><b>Sentence 1</b> ("two important characteristics") and <b>sentence 10</b> ("not only for its beauty but also for its utility").</div></details>
+        <details><summary>4 · What examples support each point?</summary><div class="ans"><b>Beauty:</b> jewelry, coins and ornaments; a Macedonian coin still untarnished after 25 centuries.<br><b>Usefulness:</b> photography and dentistry; gold-plated heat shields on astronauts' suits.</div></details>
+      </div>
+ 
+      <div class="pager"><button class="btn" data-back>← Back to Paragraph 2</button><button class="btn primary" data-next>Next: Concluding sentence →</button></div>
+    </section>
+ 
+    <!-- CONCLUDING -->
+    <section class="view" data-view="concluding" data-accent="concluding" hidden>
+      <div class="dhead">
+        <span class="eyebrow">Part 3 of 3 · Bottom layer</span>
+        <h1>The <em>concluding</em> sentence</h1>
+        <div class="def"><span class="eyebrow">Definition</span><p>The concluding sentence signals the end of the paragraph and leaves the reader with the important points to remember. Not every paragraph has one.</p></div>
+      </div>
+ 
+      <div class="sec">
+        <h2>The last line of "Gold"</h2>
+        <div class="panel">
+          <p class="quote"><span class="cue">In conclusion,</span> gold is treasured not only for its beauty but also for its utility.</p>
+          <p class="muted" style="margin-top:14px">It repeats the two points that sentence 1 announced: beauty and utility.</p>
+        </div>
+      </div>
+ 
+      <div class="sec">
+        <h2>Useful ways to begin</h2>
+        <div class="chips"><span class="chip">In conclusion,</span><span class="chip">In short,</span></div>
+      </div>
+ 
+      <div class="sec">
+        <h2>Do I need one?</h2>
+        <div class="two">
+          <div class="note"><b>Stand-alone paragraph.</b> A concluding sentence is customary, for example when you answer a test question.</div>
+          <div class="note"><b>Part of a longer piece.</b> An essay or a book chapter usually does not need one in every paragraph.</div>
+        </div>
+      </div>
+ 
+      <div class="sec">
+        <h2>The whole paragraph at a glance</h2>
+        <div class="sand">
+          <div class="a"><span>Topic sentence</span><b>Gold, a precious metal, is prized for two important characteristics.</b></div>
+          <div class="b"><span>Supporting sentences</span><b>Beauty (jewelry, coins) and usefulness (photography, dentistry, astronauts' suits)</b></div>
+          <div class="c"><span>Concluding sentence</span><b>In conclusion, gold is treasured not only for its beauty but also for its utility.</b></div>
+        </div>
+      </div>
+ 
+      <div class="sec">
+        <h2>Try it: rebuild the paragraph</h2>
+        <p class="sub">These five sentences are in the wrong order. Tap them in the right order. Clue: First of all, Second, Finally, In short.</p>
+        <div class="act">
+          <div class="pool" id="pool" aria-label="Sentences to order"></div>
+          <div class="built" id="built" aria-label="Your paragraph"></div>
+        </div>
+        <p class="status" id="status" aria-live="polite"></p>
+        <button class="btn" id="reset" type="button">↻ Shuffle again</button>
+      </div>
+ 
+      <div class="pager"><button class="btn" data-back>← Back to Paragraph 2</button><button class="btn primary" data-next>Continue to Paragraph 3 →</button></div>
+    </section>
+ 
+    
+<!-- THANKS -->
+    <section class="view" data-view="thanks" hidden>
+      <div class="split">
+        <div class="vpanel">
+          <video id="vid" controls playsinline preload="auto" src="kot.mp4"></video>
+        </div>
+        <div class="tpanel">
+          <span class="eyebrow rs" style="--c:var(--gold)">Paragraph Structure · Week 2</span>
+          <h1 class="rs">Thank you <span class="shine">for listening</span></h1>
+          <p class="lead muted rs">One paragraph, one main idea: topic sentence, supporting sentences, concluding sentence.</p>
+          <div class="btnrow rs"><button class="btn" data-back>← Back</button><button class="btn primary" data-go="home">↻ Start again</button></div>
+        </div>
+      </div>
+    </section>
+    </main>
+</div>
+ 
+<script>
+(function(){
+ 
+  var $ = function(s, r){ return (r||document).querySelector(s); };
+  var $$ = function(s, r){ return Array.prototype.slice.call((r||document).querySelectorAll(s)); };
+  var order = ['home','p1','p2','p3','p4','p5','p6','thanks'];
+  var detail = ['topic','supporting','concluding'];
+  var views = $$('.view');
+  var navBtns = $$('.navrow button');
+  var vid = $('#vid');
+ 
+  function current(){
+    var h = location.hash.slice(1);
+    return (order.indexOf(h) > -1 || detail.indexOf(h) > -1) ? h : 'home';
+  }
+  function show(name){
+    views.forEach(function(v){ v.hidden = v.getAttribute('data-view') !== name; });
+    var navName = detail.indexOf(name) > -1 ? 'p2' : name;
+    navBtns.forEach(function(b){
+      if (b.getAttribute('data-go') === navName){
+        b.setAttribute('aria-current','page');
+        try { b.scrollIntoView({inline:'center', block:'nearest'}); } catch(e){}
+      } else b.removeAttribute('aria-current');
+    });
+    window.scrollTo(0,0);
+    if (name === 'thanks'){
+      if (vid.getAttribute('src')){ try { vid.currentTime = 0; } catch(e){} var p = vid.play(); if (p && p.catch) p.catch(function(){}); }
+    } else if (vid.getAttribute('src')) { vid.pause(); }
+  }
+  function go(name){ if (location.hash.slice(1) === name){ show(name); } else { location.hash = name; } }
+  function next(){
+    var c = current(), i;
+    if (detail.indexOf(c) > -1){ i = detail.indexOf(c); go(i < detail.length - 1 ? detail[i+1] : 'p3'); return; }
+    i = order.indexOf(c); if (i < order.length - 1) go(order[i+1]);
+  }
+  function back(){
+    var c = current();
+    if (detail.indexOf(c) > -1){ go('p2'); return; }
+    var i = order.indexOf(c); if (i > 0) go(order[i-1]);
+  }
+  window.addEventListener('hashchange', function(){ show(current()); });
+  document.addEventListener('click', function(e){
+    var g = e.target.closest('[data-go]'); if (g){ go(g.getAttribute('data-go')); return; }
+    if (e.target.closest('[data-next]')) next();
+    if (e.target.closest('[data-back]')) back();
+  });
+  document.addEventListener('keydown', function(e){
+    if (e.target.closest && e.target.closest('input,textarea,video,summary')) return;
+    if (e.key === 'ArrowRight') next();
+    if (e.key === 'ArrowLeft') back();
+  });
+ 
+  /* balance tester */
+  var levels = {
+    general:  {menu:'"Salad"', egypt:'"Egyptian food"', para:'English has been influenced by other languages.', why:'Too general. The reader cannot tell what the paragraph will discuss.'},
+    right:    {menu:'"Mixed green salad"', egypt:'"Koshari"', para:'The Arabic origin of many English words is not always obvious.', why:'Just right. The reader knows what to expect, and the writer still has plenty to explain.'},
+    specific: {menu:'The full list of ingredients', egypt:'Rice, lentils, pasta, chickpeas, fried onions...', para:'The slang expression "so long" is probably a corruption of the Arabic salaam.', why:'Too specific. The writer has nothing left to write. This works as a supporting sentence.'}
+  };
+  function setLevel(k){
+    var d = levels[k];
+    $('#lv-menu').textContent = d.menu; $('#lv-egypt').textContent = d.egypt;
+    $('#lv-para').textContent = d.para; $('#lv-why').textContent = d.why;
+    $$('[data-level]').forEach(function(b){ b.setAttribute('aria-selected', b.getAttribute('data-level') === k ? 'true' : 'false'); });
+  }
+  $$('[data-level]').forEach(function(b){ b.addEventListener('click', function(){ setLevel(b.getAttribute('data-level')); }); });
+  setLevel('general');
+ 
+  /* rainbow quiz */
+  var labels = {good:'Good topic sentence', general:'Too general', specific:'Too specific'};
+  var why = {
+    good:'Correct. It is complete, it limits the topic, and it is not a detail.',
+    general:'Correct. It does not tell the reader what the paragraph will discuss.',
+    specific:'Correct. It is a detail. It could be a supporting sentence.'
+  };
+  var quiz = [
+    ['Many cultures interpret rainbows in positive ways.','good'],
+    ['Rainbows are beautiful.','general'],
+    ['A rainbow seen from an airplane is a complete circle.','specific']
+  ];
+  var qbox = $('#quiz');
+  quiz.forEach(function(q){
+    var d = document.createElement('div'); d.className = 'qz';
+    var p = document.createElement('p'); p.textContent = q[0]; d.appendChild(p);
+    var o = document.createElement('div'); o.className = 'opts';
+    var fb = document.createElement('div'); fb.className = 'fb'; fb.setAttribute('aria-live','polite');
+    Object.keys(labels).forEach(function(key){
+      var b = document.createElement('button'); b.type = 'button'; b.textContent = labels[key];
+      b.addEventListener('click', function(){
+        if (key === q[1]){
+          $$('button', o).forEach(function(x){ x.classList.remove('no'); });
+          b.classList.add('ok'); fb.textContent = why[key];
+        } else {
+          b.classList.add('no'); fb.textContent = 'Not quite. Is it complete? Too general? Too specific?';
+        }
+      });
+      o.appendChild(b);
+    });
+    d.appendChild(o); d.appendChild(fb); qbox.appendChild(d);
+  });
+ 
+  /* ordering activity */
+  var sentences = {
+    a:'Finally, visitors can eat fresh fish in the restaurants near the Corniche.',
+    b:'Alexandria is a wonderful city for a summer holiday.',
+    c:'In short, Alexandria offers sun, sea, and good food to every visitor.',
+    d:'Second, the weather is cooler than in Cairo, so families can enjoy the evenings outside.',
+    e:'First of all, it has long, sandy beaches on the Mediterranean Sea.'
+  };
+  var answer = ['b','e','d','a','c'];
+  var layouts = [['d','a','c','e','b'],['c','e','a','b','d'],['a','d','b','c','e']];
+  var layoutIdx = 0, step = 0;
+  var pool = $('#pool'), built = $('#built'), status = $('#status');
+  function buildActivity(){
+    step = 0; pool.innerHTML = ''; built.innerHTML = ''; status.textContent = ''; status.className = 'status';
+    layouts[layoutIdx % layouts.length].forEach(function(k){
+      var b = document.createElement('button'); b.type = 'button'; b.textContent = sentences[k]; b.setAttribute('data-k', k);
+      b.addEventListener('click', function(){ choose(b, k); }); pool.appendChild(b);
+    });
+    for (var i = 0; i < 5; i++){
+      var s = document.createElement('div'); s.className = 'slot'; s.innerHTML = '<i>' + (i+1) + '</i><span></span>'; built.appendChild(s);
+    }
+  }
+  function choose(btn, k){
+    if (k === answer[step]){
+      var slot = built.children[step]; slot.classList.add('done'); slot.lastChild.textContent = sentences[k];
+      btn.disabled = true; step++;
+      if (step === 5){ status.className = 'status win'; status.textContent = 'Correct. "Alexandria is a wonderful city..." is the topic sentence, and "In short..." is the concluding sentence.'; }
+      else status.textContent = '';
+    } else {
+      btn.classList.remove('shake'); void btn.offsetWidth; btn.classList.add('shake');
+      status.className = 'status';
+      status.textContent = step > 0 ? 'Not yet. Follow the clue words: First of all, Second, Finally, In short.' : 'Not yet. Which sentence gives the main idea of the whole paragraph?';
+    }
+  }
+  $('#reset').addEventListener('click', function(){ layoutIdx++; buildActivity(); });
+  buildActivity();
+ 
+  /* gold dust background */
+  var cv = $('#dust'), ctx = cv.getContext('2d'), W = 0, H = 0, dots = [];
+  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  function size(){
+    var r = window.devicePixelRatio || 1; W = window.innerWidth; H = window.innerHeight;
+    cv.width = W * r; cv.height = H * r; ctx.setTransform(r,0,0,r,0,0);
+  }
+  function seed(){
+    dots = [];
+    for (var i = 0; i < 46; i++) dots.push({x:Math.random()*W, y:Math.random()*H, r:Math.random()*1.6+.4, v:Math.random()*.25+.06, a:Math.random()*.5+.15, p:Math.random()*6.28});
+  }
+  function draw(t){
+    ctx.clearRect(0,0,W,H);
+    for (var i = 0; i < dots.length; i++){
+      var d = dots[i];
+      if (!reduce){ d.y -= d.v; d.x += Math.sin(t/2200 + d.p) * .15; if (d.y < -4){ d.y = H + 4; d.x = Math.random()*W; } }
+      ctx.beginPath(); ctx.fillStyle = 'rgba(236,187,74,' + (d.a * (.6 + .4*Math.sin(t/900 + d.p))) + ')';
+      ctx.arc(d.x, d.y, d.r, 0, 6.283); ctx.fill();
+    }
+    if (!reduce) requestAnimationFrame(draw);
+  }
+  size(); seed(); requestAnimationFrame(draw);
+  window.addEventListener('resize', function(){ size(); seed(); if (reduce) draw(0); });
+ 
+  show(current());
+})();
+</script>
+ 
